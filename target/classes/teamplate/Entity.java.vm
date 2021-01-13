@@ -1,0 +1,43 @@
+package ${package}.${moduleName}.entity;
+
+import com.baomidou.mybatisplus.annotation.TableField;
+import lombok.*;
+import com.${moduleName}.common.base.BaseEntity;
+import com.${moduleName}.common.base.CommentTarget;
+import java.util.Date;
+#if(${hasBigDecimal})
+import java.math.BigDecimal;
+#end
+
+/**
+*
+ * ${comments}
+ * @author ${author}
+ * @date ${datetime}
+*/
+@Builder(builderMethodName = "newInstance")
+@AllArgsConstructor
+@Data
+@EqualsAndHashCode(callSuper = false)
+public class m${className} extends BaseEntity {
+
+#foreach ($column in $columns)
+	/**
+	 * $column.comments
+	 */
+	#if($column.columnName !="id"&&$column.columnName !="gmt_create"&&$column.columnName !="gmt_create"&&$column.columnName !="is_deleted"&&$column.columnName !="i_sort"&&$column.columnName !="notes"&&$column.columnName !="editor"&&$column.columnName !="creator")
+	#if($column.attrType =="date")
+	@DateTimeFormat(pattern = "yyyy-MM-dd" )
+	#end
+	#if($column.attrType =="datetime")
+	@DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss.SSS" )
+	#end
+
+	@CommentTarget("$column.comments")
+	@TableField("$column.columnName")
+	private $column.attrType $column.attrname;
+	#end
+
+#end
+
+}

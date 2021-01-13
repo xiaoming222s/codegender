@@ -1,0 +1,12 @@
+package ${package}.${moduleName}.dao;
+
+import com.${moduleName}.common.base.BaseDao;
+import com.${moduleName}.entity.${className};
+
+/**
+ * ${comments}
+ * 
+ */
+public interface ${className}Dao extends BaseDao<${className}> {
+	
+}
