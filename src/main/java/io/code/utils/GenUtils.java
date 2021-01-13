@@ -32,7 +32,7 @@ public class GenUtils {
         templates.add("teamplate/EntityChild.java.vm");
         templates.add("teamplate/Dao.java.vm");
         templates.add("teamplate/Service.java.vm");
-        templates.add("teamplate/ServiceImpl.java.vm");
+//        templates.add("teamplate/ServiceImpl.java.vm");
         templates.add("teamplate/Controller.java.vm");
 
 //        templates.add("teamplatebak/Entity.java.vm");
