@@ -1,12 +1,12 @@
 /**
  */
 
-package io.renren.controller;
+package io.code.controller;
 
-import io.renren.service.SysGeneratorService;
-import io.renren.utils.PageUtils;
-import io.renren.utils.Query;
-import io.renren.utils.R;
+import io.code.service.SysGeneratorService;
+import io.code.utils.PageUtils;
+import io.code.utils.Query;
+import io.code.utils.R;
 import org.apache.commons.io.IOUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;

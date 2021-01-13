@@ -1,4 +1,4 @@
-package io.renren;
+package io.code;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;

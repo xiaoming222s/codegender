@@ -1,4 +1,4 @@
-package io.renren.utils;
+package io.code.utils;
 
 
 import java.util.LinkedHashMap;

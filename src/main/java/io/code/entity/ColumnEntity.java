@@ -1,4 +1,4 @@
-package io.renren.entity;
+package io.code.entity;
 
 /**
  * 列的属性

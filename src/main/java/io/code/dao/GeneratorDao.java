@@ -1,7 +1,7 @@
 /**
  */
 
-package io.renren.dao;
+package io.code.dao;
 
 import java.util.List;
 import java.util.Map;

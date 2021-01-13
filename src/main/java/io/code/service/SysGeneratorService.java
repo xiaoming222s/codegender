@@ -1,14 +1,14 @@
 /**
  */
 
-package io.renren.service;
+package io.code.service;
 
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
-import io.renren.dao.GeneratorDao;
-import io.renren.utils.GenUtils;
-import io.renren.utils.PageUtils;
-import io.renren.utils.Query;
+import io.code.dao.GeneratorDao;
+import io.code.utils.GenUtils;
+import io.code.utils.PageUtils;
+import io.code.utils.Query;
 import org.apache.commons.io.IOUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
