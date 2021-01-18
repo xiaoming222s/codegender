@@ -12,7 +12,7 @@ import java.util.Arrays;
  */
 public enum ${enumName}Enum {
     #foreach ($en in $enums)
-$en.englishName ($en.value,"$en.chineseName")#if($foreach.hasNext),#else;#end 
+$en.englishName ($en.value,"$en.chineseName")#if($foreach.hasNext),#else;#end
     #end
 
     @EnumValue
@@ -21,7 +21,7 @@ $en.englishName ($en.value,"$en.chineseName")#if($foreach.hasNext),#else;#end
     private String name;
 
 
-        ${enumName}Enum(Integer code, String name) {
+   ${enumName}Enum(Integer code, String name) {
         this.value = code;
         this.name = name;
     }
