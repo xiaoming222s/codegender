@@ -20,7 +20,7 @@ import org.springframework.format.annotation.DateTimeFormat;
  * @date ${datetime}
 */
 @Builder(builderMethodName = "newInstance")
-@NoArgsConstructor
+@AllArgsConstructor
 @Data
 @EqualsAndHashCode(callSuper = false)
 @TableName(value = "$tableName")

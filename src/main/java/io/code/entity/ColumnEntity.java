@@ -1,5 +1,7 @@
 package io.code.entity;
 
+import java.util.List;
+
 /**
  * 列的属性
  * 
@@ -23,7 +25,8 @@ public class ColumnEntity {
     private String attrType;
     //auto_increment
     private String extra;
-    
+
+	private List<EnumEntity> enums;
 	public String getColumnName() {
 		return columnName;
 	}

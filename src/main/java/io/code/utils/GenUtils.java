@@ -1,6 +1,7 @@
 package io.code.utils;
 
 import io.code.entity.ColumnEntity;
+import io.code.entity.EnumEntity;
 import io.code.entity.TableEntity;
 import org.apache.commons.configuration.Configuration;
 import org.apache.commons.configuration.ConfigurationException;
@@ -31,9 +32,10 @@ public class GenUtils {
         templates.add("teamplate/Entity.java.vm");
         templates.add("teamplate/EntityChild.java.vm");
         templates.add("teamplate/Dao.java.vm");
-        templates.add("teamplate/Service.java.vm");
-//        templates.add("teamplate/ServiceImpl.java.vm");
+        templates.add("teamplate/ServiceImpl.java.vm");
         templates.add("teamplate/Controller.java.vm");
+//        templates.add("teamplate/Enum.java.vm");
+
 
 //        templates.add("teamplatebak/Entity.java.vm");
 //        templates.add("teamplatebak/Dao.java.vm");
@@ -67,6 +69,8 @@ public class GenUtils {
 
         //列信息
         List<ColumnEntity> columsList = new ArrayList<>();
+        Boolean generEnum=false;
+        String enumName="";
         for(Map<String, String> column : columns){
             ColumnEntity columnEntity = new ColumnEntity();
             columnEntity.setColumnName(column.get("columnName" ));
@@ -78,6 +82,50 @@ public class GenUtils {
             String attrName = columnToJava(columnEntity.getColumnName());
             columnEntity.setAttrName(attrName);
             columnEntity.setAttrname(StringUtils.uncapitalize(attrName));
+
+            String comments = columnEntity.getComments();
+            //枚举处理   注释:flag:中文名 英文名 value,中文名 英文名 value
+            ArrayList<EnumEntity> enumEntities = new ArrayList<>();
+            String[] flag = comments.split("enum:");
+//             if(flag.length==2){
+//                 //按照,切分某个字段注释
+//                 String[] enums = flag[1].split(";");
+//                 if(enums.length>1){
+//                     HashMap<String,Object>  map= new HashMap<String,Object>();
+//                     //获取枚举的各个属性
+//                     for (int i = 0; i <enums.length ; i++) {
+//                         String anEnum = enums[i];
+//                         String[] split = anEnum.split("_");
+//                         if(split.length==3){
+//                             EnumEntity en = new EnumEntity();
+//                             en.setChineseName(split[1].toUpperCase());
+//                             en.setEnglishName(split[0].toUpperCase());
+//                             en.setValue(split[2]);
+//                             enumEntities.add(en);
+//                         }
+//                     }
+//                     if(enumEntities.size()>0){
+//                         map.put("enumName",columnEntity.getAttrName());
+//                         map.put("enums",enumEntities);
+//                         VelocityContext context = new VelocityContext(map);
+//                         //渲染模板
+//                         StringWriter sw = new StringWriter();
+//                         Template tpl = Velocity.getTemplate("teamplate/Enum.java.vm", "UTF-8" );
+//                         tpl.merge(context, sw);
+//                         try {
+//                             //添加到zip
+//                             zip.putNextEntry(new ZipEntry(getFileName("teamplate/Enum.java.vm", tableEntity.getClassName(), config.getString("package" ), config.getString("moduleName" ))));
+//                             IOUtils.write(sw.toString(), zip, "UTF-8" );
+//                             IOUtils.closeQuietly(sw);
+//                             zip.closeEntry();
+//                         } catch (IOException e) {
+//                             throw new RRException("枚举渲染模板失败，表名：" + tableEntity.getTableName(), e);
+//                         }
+//                     }
+//
+//                 }
+//
+//             }
 
             //列的数据类型，转换成Java类型
             String attrType = config.getString(columnEntity.getDataType(), "unknowType" );
@@ -122,7 +170,6 @@ public class GenUtils {
         map.put("email", config.getString("email" ));
         map.put("datetime", DateUtils.format(new Date(), DateUtils.DATE_TIME_PATTERN));
         VelocityContext context = new VelocityContext(map);
-
         //获取模板列表
         List<String> templates = getTemplates();
         for (String template : templates) {
@@ -132,6 +179,7 @@ public class GenUtils {
             tpl.merge(context, sw);
 
             try {
+                System.out.println("template------"+template);
                 //添加到zip
                 zip.putNextEntry(new ZipEntry(getFileName(template, tableEntity.getClassName(), config.getString("package" ), config.getString("moduleName" ))));
                 IOUtils.write(sw.toString(), zip, "UTF-8" );
@@ -192,8 +240,8 @@ public class GenUtils {
             return packagePath + "dao" + File.separator + className + "Dao.java";
         }
 
-        if (template.contains("Service.java.vm" )) {
-            return packagePath + "service" + File.separator + className + "Service.java";
+        if (template.contains("Enum.java.vm")) {
+            return packagePath + "enums" + File.separator + className + "Enum.java";
         }
 
         if (template.contains("ServiceImpl.java.vm" )) {
