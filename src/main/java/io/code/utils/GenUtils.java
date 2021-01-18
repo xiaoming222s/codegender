@@ -26,14 +26,16 @@ import java.util.zip.ZipOutputStream;
  */
 public class GenUtils {
 
+    public final static String enumTemplate ="src/main/resources/teamplate/Enum.java.vm";
+
     public static List<String> getTemplates(){
         List<String> templates = new ArrayList<String>();
 
-        templates.add("teamplate/Entity.java.vm");
-        templates.add("teamplate/EntityChild.java.vm");
-        templates.add("teamplate/Dao.java.vm");
-        templates.add("teamplate/ServiceImpl.java.vm");
-        templates.add("teamplate/Controller.java.vm");
+        templates.add("src/main/resources/teamplate/Entity.java.vm");
+        templates.add("src/main/resources/teamplate/EntityChild.java.vm");
+        templates.add("src/main/resources/teamplate/Dao.java.vm");
+        templates.add("src/main/resources/teamplate/ServiceImpl.java.vm");
+        templates.add("src/main/resources/teamplate/Controller.java.vm");
 //        templates.add("teamplate/Enum.java.vm");
 
 
@@ -87,47 +89,49 @@ public class GenUtils {
             //枚举处理   注释:flag:中文名 英文名 value,中文名 英文名 value
             ArrayList<EnumEntity> enumEntities = new ArrayList<>();
             String[] flag = comments.split("enum:");
-//             if(flag.length==2){
-//                 //按照,切分某个字段注释
-//                 String[] enums = flag[1].split(";");
-//                 if(enums.length>1){
-//                     HashMap<String,Object>  map= new HashMap<String,Object>();
-//                     //获取枚举的各个属性
-//                     for (int i = 0; i <enums.length ; i++) {
-//                         String anEnum = enums[i];
-//                         String[] split = anEnum.split("_");
-//                         if(split.length==3){
-//                             EnumEntity en = new EnumEntity();
-//                             en.setChineseName(split[1].toUpperCase());
-//                             en.setEnglishName(split[0].toUpperCase());
-//                             en.setValue(split[2]);
-//                             enumEntities.add(en);
-//                         }
-//                     }
-//                     if(enumEntities.size()>0){
-//                         map.put("enumName",columnEntity.getAttrName());
-//                         map.put("enums",enumEntities);
-//                         VelocityContext context = new VelocityContext(map);
-//                         //渲染模板
-//                         StringWriter sw = new StringWriter();
-//                         Template tpl = Velocity.getTemplate("teamplate/Enum.java.vm", "UTF-8" );
-//                         tpl.merge(context, sw);
-//                         try {
-//                             //添加到zip
-//                             zip.putNextEntry(new ZipEntry(getFileName("teamplate/Enum.java.vm", tableEntity.getClassName(), config.getString("package" ), config.getString("moduleName" ))));
-//                             IOUtils.write(sw.toString(), zip, "UTF-8" );
-//                             IOUtils.closeQuietly(sw);
-//                             zip.closeEntry();
-//                         } catch (IOException e) {
-//                             throw new RRException("枚举渲染模板失败，表名：" + tableEntity.getTableName(), e);
-//                         }
-//                     }
-//
-//                 }
-//
-//             }
+             if(flag.length==2){
+                 //按照,切分某个字段注释
+                 String[] enums = flag[1].split(";");
+                 if(enums.length>1){
+                     HashMap<String,Object>  map= new HashMap<String,Object>();
+                     //获取枚举的各个属性
+                     for (int i = 0; i <enums.length ; i++) {
+                         String anEnum = enums[i];
+                         String[] split = anEnum.split("_");
+                         if(split.length==3){
+                             EnumEntity en = new EnumEntity();
+                             en.setChineseName(split[1].toUpperCase());
+                             en.setEnglishName(split[0].toUpperCase());
+                             en.setValue(split[2]);
+                             enumEntities.add(en);
+                         }
+                     }
+                     if(enumEntities.size()>0){
+                         map.put("enumName",columnEntity.getAttrName());
+                         map.put("enums",enumEntities);
+                         map.put("package", config.getString("package" ));
+                         map.put("moduleName", config.getString("moduleName" ));
+                         VelocityContext context = new VelocityContext(map);
+                         //渲染模板
+                         StringWriter sw = new StringWriter();
+                         Template tpl = Velocity.getTemplate(enumTemplate, "UTF-8" );
+                         tpl.merge(context, sw);
+                         try {
+                             //添加到zip
+                             zip.putNextEntry(new ZipEntry(getFileName(enumTemplate, columnEntity.getAttrName(), config.getString("package" ), config.getString("moduleName" ))));
+                             IOUtils.write(sw.toString(), zip, "UTF-8" );
+                             IOUtils.closeQuietly(sw);
+                             zip.closeEntry();
+                         } catch (IOException e) {
+                             throw new RRException("枚举渲染模板失败，表名：" + tableEntity.getTableName(), e);
+                         }
+                     }
 
-            //列的数据类型，转换成Java类型
+                 }
+
+             }
+
+//            列的数据类型，转换成Java类型
             String attrType = config.getString(columnEntity.getDataType(), "unknowType" );
             columnEntity.setAttrType(attrType);
             if (!hasBigDecimal && attrType.equals("BigDecimal" )) {

@@ -1,5 +1,7 @@
 package ${package}.${moduleName}.enums;
-import lombok.AllArgsConstructor;
+
+import com.baomidou.mybatisplus.annotation.EnumValue;
+import com.fasterxml.jackson.annotation.JsonValue;
 
 /**
  * ${comments}
@@ -7,12 +9,10 @@ import lombok.AllArgsConstructor;
  * @author ${author}
  * @date ${datetime}
  */
-@AllArgsConstructor
 public enum ${enumName}Enum {
-
-    #foreach ($en in $enums)
-        $en.englishName ("$en.value","$en.chineseName"),
-    #end
+#foreach ($en in $enums)
+$en.englishName ($en.value,"$en.chineseName")#if($foreach.hasNext),#else;#end
+#end
 
 @EnumValue
 private  Integer value;
