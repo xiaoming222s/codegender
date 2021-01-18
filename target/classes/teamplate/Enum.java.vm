@@ -2,6 +2,7 @@ package ${package}.${moduleName}.enums;
 
 import com.baomidou.mybatisplus.annotation.EnumValue;
 import com.fasterxml.jackson.annotation.JsonValue;
+import java.util.Arrays;
 
 /**
  * ${comments}
@@ -10,47 +11,48 @@ import com.fasterxml.jackson.annotation.JsonValue;
  * @date ${datetime}
  */
 public enum ${enumName}Enum {
-#foreach ($en in $enums)
-$en.englishName ($en.value,"$en.chineseName")#if($foreach.hasNext),#else;#end
-#end
+    #foreach ($en in $enums)
+$en.englishName ($en.value,"$en.chineseName")#if($foreach.hasNext),#else;#end 
+    #end
 
-@EnumValue
-private  Integer value;
-@JsonValue
-private  String name;
+    @EnumValue
+    private Integer value;
+    @JsonValue
+    private String name;
 
 
- ${enumName}Enum(Integer code, String name) {
+        ${enumName}Enum(Integer code, String name) {
         this.value = code;
         this.name = name;
-}
+    }
 
-public static ${enumName}Enum of(Integer value) {
+    public static ${enumName}Enum of(Integer value) {
         return Arrays.stream(${enumName}Enum.values())
-        .filter(e->e.getValue().equals(value))
-        .findAny().orElse(null);
-}
+                .filter(e -> e.getValue().equals(value))
+                .findAny().orElse(null);
+    }
 
-/**
- * 判断值是否在枚举中存在
- * @param value
- * @return
- */
-public static boolean exist(Integer value){
+    /**
+     * 判断值是否在枚举中存在
+     * @param value
+     * @return
+     */
+    public static boolean exist(Integer value) {
         return Arrays.stream(${enumName}Enum.values())
-        .filter(e->e.getValue().equals(value))
-        .findAny().map(e->{ return true;})
-        .orElse(false);
- }
+                .filter(e -> e.getValue().equals(value))
+                .findAny().map(e -> {
+                    return true;
+                })
+                .orElse(false);
+    }
 
 
-
-public Integer getValue() {
+    public Integer getValue() {
         return this.value;
-}
+    }
 
-public String getName() {
+    public String getName() {
         return this.name;
- }
+    }
 
-]
+}

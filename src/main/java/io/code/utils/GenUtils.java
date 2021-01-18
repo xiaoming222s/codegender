@@ -3,6 +3,7 @@ package io.code.utils;
 import io.code.entity.ColumnEntity;
 import io.code.entity.EnumEntity;
 import io.code.entity.TableEntity;
+import jdk.nashorn.internal.runtime.regexp.joni.Config;
 import org.apache.commons.configuration.Configuration;
 import org.apache.commons.configuration.ConfigurationException;
 import org.apache.commons.configuration.PropertiesConfiguration;
@@ -26,16 +27,16 @@ import java.util.zip.ZipOutputStream;
  */
 public class GenUtils {
 
-    public final static String enumTemplate ="src/main/resources/teamplate/Enum.java.vm";
+    public final static String enumTemplate ="teamplate/Enum.java.vm";
 
     public static List<String> getTemplates(){
         List<String> templates = new ArrayList<String>();
 
-        templates.add("src/main/resources/teamplate/Entity.java.vm");
-        templates.add("src/main/resources/teamplate/EntityChild.java.vm");
-        templates.add("src/main/resources/teamplate/Dao.java.vm");
-        templates.add("src/main/resources/teamplate/ServiceImpl.java.vm");
-        templates.add("src/main/resources/teamplate/Controller.java.vm");
+        templates.add("teamplate/Entity.java.vm");
+        templates.add("teamplate/EntityChild.java.vm");
+        templates.add("teamplate/Dao.java.vm");
+        templates.add("teamplate/ServiceImpl.java.vm");
+        templates.add("teamplate/Controller.java.vm");
 //        templates.add("teamplate/Enum.java.vm");
 
 
@@ -84,53 +85,8 @@ public class GenUtils {
             String attrName = columnToJava(columnEntity.getColumnName());
             columnEntity.setAttrName(attrName);
             columnEntity.setAttrname(StringUtils.uncapitalize(attrName));
-
-            String comments = columnEntity.getComments();
             //枚举处理   注释:flag:中文名 英文名 value,中文名 英文名 value
-            ArrayList<EnumEntity> enumEntities = new ArrayList<>();
-            String[] flag = comments.split("enum:");
-             if(flag.length==2){
-                 //按照,切分某个字段注释
-                 String[] enums = flag[1].split(";");
-                 if(enums.length>1){
-                     HashMap<String,Object>  map= new HashMap<String,Object>();
-                     //获取枚举的各个属性
-                     for (int i = 0; i <enums.length ; i++) {
-                         String anEnum = enums[i];
-                         String[] split = anEnum.split("_");
-                         if(split.length==3){
-                             EnumEntity en = new EnumEntity();
-                             en.setChineseName(split[1].toUpperCase());
-                             en.setEnglishName(split[0].toUpperCase());
-                             en.setValue(split[2]);
-                             enumEntities.add(en);
-                         }
-                     }
-                     if(enumEntities.size()>0){
-                         map.put("enumName",columnEntity.getAttrName());
-                         map.put("enums",enumEntities);
-                         map.put("package", config.getString("package" ));
-                         map.put("moduleName", config.getString("moduleName" ));
-                         VelocityContext context = new VelocityContext(map);
-                         //渲染模板
-                         StringWriter sw = new StringWriter();
-                         Template tpl = Velocity.getTemplate(enumTemplate, "UTF-8" );
-                         tpl.merge(context, sw);
-                         try {
-                             //添加到zip
-                             zip.putNextEntry(new ZipEntry(getFileName(enumTemplate, columnEntity.getAttrName(), config.getString("package" ), config.getString("moduleName" ))));
-                             IOUtils.write(sw.toString(), zip, "UTF-8" );
-                             IOUtils.closeQuietly(sw);
-                             zip.closeEntry();
-                         } catch (IOException e) {
-                             throw new RRException("枚举渲染模板失败，表名：" + tableEntity.getTableName(), e);
-                         }
-                     }
-
-                 }
-
-             }
-
+            generateEnum( columnEntity,  config , zip, tableEntity);
 //            列的数据类型，转换成Java类型
             String attrType = config.getString(columnEntity.getDataType(), "unknowType" );
             columnEntity.setAttrType(attrType);
@@ -195,7 +151,62 @@ public class GenUtils {
         }
     }
 
+    /**
+     * 生成枚举    注释; + enum: + 英文名_中文名_value,英文名_中文名_value
+     *    eg: 测试;enum:one_是_1,two_否_2
+     * @param columnEntity
+     * @param config
+     * @param zip
+     * @param tableEntity
+     */
+ public static void generateEnum(ColumnEntity columnEntity, Configuration config ,ZipOutputStream zip,TableEntity tableEntity){
+     String comments = columnEntity.getComments();
+     ArrayList<EnumEntity> enumEntities = new ArrayList<>();
+     //按照固定的切分规则切分 枚举的具体内容  第一次切分
+     String[] flag = comments.split("enum:");
+     if(flag.length==2){
+         //按照, 切分枚举字段   第二次切分
+         String[] enums = flag[1].split(",");
+         if(enums.length>1){
+             HashMap<String,Object>  map= new HashMap<String,Object>();
+             //获取枚举的各个属性
+             for (int i = 0; i <enums.length ; i++) {
+                 String anEnum = enums[i];
+                 //按照_切分枚举的各个属性   第三次切分
+                 String[] split = anEnum.split("_");
+                 if(split.length==3){
+                     EnumEntity en = new EnumEntity();
+                     en.setChineseName(split[1].toUpperCase());
+                     en.setEnglishName(split[0].toUpperCase());
+                     en.setValue(split[2]);
+                     enumEntities.add(en);
+                 }
+             }
+             if(enumEntities.size()>0){
+                 map.put("enumName",columnEntity.getAttrName());
+                 map.put("enums",enumEntities);
+                 map.put("package", config.getString("package" ));
+                 map.put("moduleName", config.getString("moduleName" ));
+                 VelocityContext context = new VelocityContext(map);
+                 //渲染模板
+                 StringWriter sw = new StringWriter();
+                 Template tpl = Velocity.getTemplate(enumTemplate, "UTF-8" );
+                 tpl.merge(context, sw);
+                 try {
+                     //添加到zip
+                     zip.putNextEntry(new ZipEntry(getFileName(enumTemplate, columnEntity.getAttrName(), config.getString("package" ), config.getString("moduleName" ))));
+                     IOUtils.write(sw.toString(), zip, "UTF-8" );
+                     IOUtils.closeQuietly(sw);
+                     zip.closeEntry();
+                 } catch (IOException e) {
+                     throw new RRException("枚举渲染模板失败，表名：" + tableEntity.getTableName(), e);
+                 }
+             }
 
+         }
+
+     }
+ }
     /**
      * 列名转换成Java属性名
      */
