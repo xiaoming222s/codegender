@@ -1,4 +1,4 @@
-package ${package}.${moduleName}.entity;
+package ${package}.${moduleName}.entity.generated;
 
 import com.baomidou.mybatisplus.annotation.TableField;
 import lombok.*;
@@ -10,34 +10,39 @@ import java.math.BigDecimal;
 #end
 
 /**
-*
+ *
  * ${comments}
  * @author ${author}
  * @date ${datetime}
-*/
-@Builder(builderMethodName = "newInstance")
-@AllArgsConstructor
+ */
 @Data
+@NoArgsConstructor
 @EqualsAndHashCode(callSuper = false)
 public class m${className} extends BaseEntity {
 
-#foreach ($column in $columns)
-	/**
-	 * $column.comments
-	 */
-	#if($column.columnName !="id"&&$column.columnName !="gmt_create"&&$column.columnName !="gmt_create"&&$column.columnName !="is_deleted"&&$column.columnName !="i_sort"&&$column.columnName !="notes"&&$column.columnName !="editor"&&$column.columnName !="creator")
-	#if($column.attrType =="date")
-	@DateTimeFormat(pattern = "yyyy-MM-dd" )
-	#end
-	#if($column.attrType =="datetime")
-	@DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss.SSS" )
-	#end
+ #foreach ($column in $columns)
 
-	@CommentTarget("$column.comments")
-	@TableField("$column.columnName")
-	private $column.attrType $column.attrname;
-	#end
-
+/**
+ * $column.comments
+ */
+#if($column.columnName !="id"&&$column.columnName !="gmt_create"&&$column.columnName !=  "gmt_create"&&$column.columnName !="is_deleted"&&$column.columnName !="i_sort"&&$column.columnName !="notes"&&$column.columnName !="editor"&&$column.columnName !="creator")
+#if($column.attrType =="date")
+@DateTimeFormat(pattern = "yyyy-MM-dd")
 #end
+ #if($column.attrType =="datetime")
+@DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss.SSS")
+#end
+ #if($column.enumFlag == "1")
+@CommentTarget("$column.comments")
+@TableField("$column.columnName")
+ private $column.enumName $column.attrname;
+      #else
+@CommentTarget("$column.comments")
+@TableField("$column.columnName")
+ private $column.attrType $column.attrname;
+ #end
+ #end
+
+ #end
 
 }

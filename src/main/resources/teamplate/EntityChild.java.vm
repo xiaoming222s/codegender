@@ -1,12 +1,12 @@
-package ${package}.${moduleName}.entity.generated;
+package ${package}.${moduleName}.entity;
 
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import lombok.*;
-
-import com.mybatis.common.base.BaseEntity;
-import com.mybatis.common.base.CommentTarget;
+import ${package}.${moduleName}.entity.generated.m${className};
+import ${package}.${moduleName}.common.base.BaseEntity;
+import ${package}.${moduleName}.common.base.CommentTarget;
 #if(${hasBigDecimal})
 import java.math.BigDecimal;
 #end
@@ -24,7 +24,7 @@ import org.springframework.format.annotation.DateTimeFormat;
 @Data
 @EqualsAndHashCode(callSuper = false)
 @TableName(value = "$tableName")
-public class ${className} extends m${className} {
+public class  ${className} extends m${className} {
 
 
 }

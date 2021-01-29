@@ -1,13 +1,13 @@
 package ${package}.${moduleName}.controller;
-
+import  ${package}.${moduleName}.common.base.PageElementGrid;
 import ${package}.${moduleName}.entity.${className};
 import ${package}.${moduleName}.service.${className}ServiceImpl;
 import ${package}.${moduleName}.common.base.controller.BaseWebController;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
-import com.mybatis.common.constants.ConstString;
-import com.mybatis.common.pojos.SystemResponse;
-import com.mybatis.common.util.ConvertUtil;
-import com.mybatis.common.util.JsonUtil;
+import ${package}.${moduleName}.common.constants.ConstString;
+import ${package}.${moduleName}.common.pojos.SystemResponse;
+import ${package}.${moduleName}.common.util.ConvertUtil;
+import ${package}.${moduleName}.common.util.JsonUtil;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;

@@ -26,7 +26,15 @@ public class ColumnEntity {
     //auto_increment
     private String extra;
 
+    //1 true  0 false
+	private Integer enumFlag;
+	private String enumName;
+
 	private List<EnumEntity> enums;
+
+	public ColumnEntity() {
+	}
+
 	public String getColumnName() {
 		return columnName;
 	}
@@ -68,5 +76,21 @@ public class ColumnEntity {
 	}
 	public void setExtra(String extra) {
 		this.extra = extra;
+	}
+
+	public Integer getEnumFlag() {
+		return enumFlag;
+	}
+
+	public void setEnumFlag(Integer enumFlag) {
+		this.enumFlag = enumFlag;
+	}
+
+	public String getEnumName() {
+		return enumName;
+	}
+
+	public void setEnumName(String enumName) {
+		this.enumName = enumName;
 	}
 }
