@@ -75,10 +75,15 @@ public class GenUtils {
             columnEntity.setAttrName(attrName);
             columnEntity.setAttrname(StringUtils.uncapitalize(attrName));
             boolean enumFlagBoolean = column.get("columnComment").contains(enumFlag);
-            columnEntity.setEnumFlag(enumFlagBoolean==true?1:0);
-            if(enumFlagBoolean){
-                columnEntity.setEnumName(attrName+"Enum");
+            columnEntity.setEnumFlag(enumFlagBoolean == true ? 1 : 0);
+            if (enumFlagBoolean) {
+                columnEntity.setEnumName(attrName + "Enum");
             }
+            //生成树形化
+            if("gradation_code".equals(columnEntity.getColumnName())){
+                tableEntity.setIstree(true);
+            }
+            //生成枚举
             generateEnum(columnEntity, config, zip, tableEntity);
 //            列的数据类型，转换成Java类型
             String attrType = config.getString(columnEntity.getDataType(), "unknowType");
@@ -120,6 +125,7 @@ public class GenUtils {
         map.put("moduleName", config.getString("moduleName"));
         map.put("author", config.getString("author"));
         map.put("email", config.getString("email"));
+        map.put("istree",tableEntity.getIstree());
         map.put("datetime", DateUtils.format(new Date(), DateUtils.DATE_TIME_PATTERN));
         VelocityContext context = new VelocityContext(map);
         //获取模板列表
