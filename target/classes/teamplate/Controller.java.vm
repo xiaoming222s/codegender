@@ -1,5 +1,8 @@
 package ${package}.${moduleName}.controller;
-import  ${package}.${moduleName}.common.base.PageElementGrid;
+
+import ${package}.${moduleName}.common.tree.zTree;
+import ${package}.${moduleName}.common.tree.zTreeStructure;
+import ${package}.${moduleName}.common.base.PageElementGrid;
 import ${package}.${moduleName}.entity.${className};
 import ${package}.${moduleName}.service.${className}ServiceImpl;
 import ${package}.${moduleName}.common.base.controller.BaseWebController;
@@ -13,8 +16,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Mono;
+
 import java.util.List;
 import java.util.Map;
+
 /**
  * ${comments}
  *
@@ -23,49 +28,103 @@ import java.util.Map;
  */
 @RestController
 @RequestMapping("${classname}")
-public class ${className}Controller extends BaseWebController{
+public class ${className}Controller extends BaseWebController {
     @Autowired
     private ${className}ServiceImpl service;
 
+    #if($istree ==true)
+        /**
+           * 获取树数据
+           * @param entity 统一查询条件
+           * @return
+           */
+        @PostMapping("/tree")
+        @ResponseBody
+        public Mono<ResponseEntity<SystemResponse<Object>>> tree(@RequestBody ${className} entity) {
+
+            LambdaQueryWrapper<${className}> ew = new LambdaQueryWrapper(); ;
+            List<${className}> list = service.list(ew);
+            zTreeStructure structure = zTreeStructure.newInstance()
+                    .idField("id")
+                    .textField("name")
+                    .parentField("idParent")
+                    .kidField("gradationCode,ilevel")
+                    .build();
+            return success(zTree.getTree(list, structure));
+
+        }
 
 
-    /**
-     * 保存和修改
-     */
-    @PostMapping("/save")
-    @ResponseBody
-    public Mono<ResponseEntity<SystemResponse<Object>>>  save(@RequestBody ${className} entity) {
-        service.saveOrUpdate(entity);
-        return success();
-    }
+        /**
+        * 添加或修改
+        * @return
+        */
+        @PostMapping("/save")
+        @ResponseBody
+        public Mono<ResponseEntity<SystemResponse<Object>>> save(@RequestBody ${className} entity) {
 
-    /**
-     * 列表
-     */
-    @RequestMapping("/list")
-    @ResponseBody
-    public Mono<ResponseEntity<SystemResponse<Object>>> list(@RequestBody ${className} search) {
-        LambdaQueryWrapper<${className} > ew = new LambdaQueryWrapper(search);;
-        List list = service.list(ew);
-        PageElementGrid result = PageElementGrid.<Map<String,Object>>newInstance()
-                .total(Long.valueOf(list.size()))
-                .items(convert2List(list)).build();
-        return success(result);
+            if (entity.getId() == null) {
+                LambdaQueryWrapper<${className}> ew = new LambdaQueryWrapper<${className}>();
+                String gradationCode = "";
+                if (entity.getIdParent() == null) {
+                    ew.isNull(${className}::getIdParent);
+                } else {
+                    ew.eq(${className}::getIdParent, entity.getIdParent());
+                    gradationCode = entity.getGradationCode();
+                }
+                int max = service.count2(ew) + 1;
+                entity.setGradationCode(gradationCode + ConstString.SEPARATOR_POINT + max);
+                entity.setLevel(entity.getGradationCode().split(ConstString.SPLIT_POINT).length);
+            }
 
-    }
+            service.saveOrUpdate(entity);
+            return success(null);
+        }
+
+    #else
+
+        /**
+      * 保存和修改
+      */
+        @PostMapping("/save")
+        @ResponseBody
+        public Mono<ResponseEntity<SystemResponse<Object>>> save(@RequestBody ${className} entity) {
+            service.saveOrUpdate(entity);
+            return success();
+        }
+
+        /**
+         * 列表
+         */
+        @RequestMapping("/list")
+        @ResponseBody
+        public Mono<ResponseEntity<SystemResponse<Object>>> list(@RequestBody ${className} search) {
+            LambdaQueryWrapper<${className} > ew = new LambdaQueryWrapper(search);
+            List list = service.list(ew);
+            PageElementGrid result = PageElementGrid.<Map<String, Object>>newInstance()
+                    .total(Long.valueOf(list.size()))
+                    .items(convert2List(list)).build();
+            return success(result);
+
+        }
+
+
+
+
+    #end
 
     /**
         * 将实体列表 转换为List Map
         * @param list 实体列表
         * @return
         */
-    private List<Map<String, Object>> convert2List(List<${className}> list){
+    private List<Map<String, Object>> convert2List(List<${className}> list) {
 
-        return JsonUtil.<${className}>ObjectToList(list,
-                (m, entity) -> {
-                    adapterField(m, entity);
-                }#foreach ($column in $columns),${className}::get$column.attrName ##
-        #end );
+            return JsonUtil.<${className}>ObjectToList(list,
+            (m, entity) -> {
+                adapterField(m, entity);
+            }#foreach ($column in $columns)   #if($column.columnName =="i_sort") ${className}::getSort #end,${className}::get$column.attrName ##
+#end );
     }
 
     /**
@@ -73,12 +132,12 @@ public class ${className}Controller extends BaseWebController{
     * @param ent 实体
     * @return
     */
-    private Map<String, Object> convert2Map(${className} ent){
-        return JsonUtil.<${className}>ObjectToMap(ent,
-                (m, entity) -> {
-                    adapterField(m,entity);
-                }#foreach ($column in $columns),${className}::get$column.attrName ##
-        #end );
+    private Map<String, Object> convert2Map(${className} ent) {
+            return JsonUtil.<${className}>ObjectToMap(ent,
+            (m, entity) -> {
+                adapterField(m, entity);
+            }#foreach ($column in $columns) #if($column.columnName =="i_sort") ${className}::getSort #end,${className}::get$column.attrName ##
+         #end );
     }
 
     /**
@@ -86,34 +145,31 @@ public class ${className}Controller extends BaseWebController{
         * @param m 适配的结果
         * @param entity 需要适配的实体
         */
-    private void adapterField(Map<String, Object> m,${className} entity){
-        if(!StringUtils.isEmpty(entity.getCreator())) {
-            if(entity.getCreator().indexOf(ConstString.SEPARATOR_POINT)>-1) {
+    private void adapterField(Map<String, Object> m,${className} entity) {
+        if (!StringUtils.isEmpty(entity.getCreator())) {
+            if (entity.getCreator().indexOf(ConstString.SEPARATOR_POINT) > -1) {
                 m.put("creator", entity.getCreator().split(ConstString.SPLIT_POINT)[1]);
-            }
-            else {
+            } else {
                 m.put("creator", entity.getCreator());
             }
         }
-        if(!StringUtils.isEmpty(entity.getEditor())) {
-            if(entity.getEditor().indexOf(ConstString.SEPARATOR_POINT)>-1) {
+        if (!StringUtils.isEmpty(entity.getEditor())) {
+            if (entity.getEditor().indexOf(ConstString.SEPARATOR_POINT) > -1) {
                 m.put("editor", entity.getEditor().split(ConstString.SPLIT_POINT)[1]);
-            }
-            else {
+            } else {
                 m.put("editor", entity.getEditor());
             }
         }
-    #foreach ($column in $columns)
-        #if($column.dataType =="date")
-         if(entity.get$column.attrName()!=null){
-          m.put("$column.attrName", DateUtils.formatDate(entity.get$column.attrName(),"yyyy'-'MM'-'dd HH:mm:ss"));
-         }
+        ##       时间戳 日期格式化
+        #foreach ($column in $columns)
+            #if($column.dataType =="date")
+                if (entity.get$column.attrName() != null) {
+                    m.put("$column.attrName", DateUtils.formatDate(entity.get$column.attrName(), "yyyy'-'MM'-'dd HH:mm:ss"));
+                }
+            #end
         #end
-    #end
 
     }
-
-
 
 
     /**
@@ -122,13 +178,10 @@ public class ${className}Controller extends BaseWebController{
         * @return
         */
     @DeleteMapping("/del/{ids}")
-    public Mono<ResponseEntity<SystemResponse<Object>>>  del(@PathVariable("ids") String ids) {
+    public Mono<ResponseEntity<SystemResponse<Object>>> del(@PathVariable("ids") String ids) {
         service.removeByIds(ConvertUtil.arrString2Long(ids.split(ConstString.SPLIT_COMMA)));
         return success();
     }
-
-
-
 
 
 }
