@@ -26,7 +26,7 @@ import java.util.zip.ZipOutputStream;
  */
 public class GenUtils {
 
-    public final static String enumTemplate = "src/main/resources/teamplate/Enum.java.vm";
+    public final static String enumTemplate = "teamplate/Enum.java.vm";
     public final static String enumFlag = "enum:";
     public final static String enumCommentOneFlag = ",";
     public final static String enumCommentTwoFlag = "_";
@@ -34,11 +34,11 @@ public class GenUtils {
     public static List<String> getTemplates() {
         List<String> templates = new ArrayList<String>();
 
-        templates.add("src/main/resources/teamplate/Entity.java.vm");
-        templates.add("src/main/resources/teamplate/EntityChild.java.vm");
-        templates.add("src/main/resources/teamplate/Dao.java.vm");
-        templates.add("src/main/resources/teamplate/ServiceImpl.java.vm");
-        templates.add("src/main/resources/teamplate/Controller.java.vm");
+        templates.add("teamplate/Entity.java.vm");
+        templates.add("teamplate/EntityChild.java.vm");
+        templates.add("teamplate/Dao.java.vm");
+        templates.add("teamplate/ServiceImpl.java.vm");
+        templates.add("teamplate/Controller.java.vm");
 
         return templates;
     }
@@ -66,7 +66,11 @@ public class GenUtils {
         String enumName = "";
         for (Map<String, String> column : columns) {
             ColumnEntity columnEntity = new ColumnEntity();
-            columnEntity.setColumnName(column.get("columnName"));
+            if(column.get("columnName").contains("i_")){
+                columnEntity.setColumnName(column.get("columnName").replace("i_",""));
+            }else {
+                columnEntity.setColumnName(column.get("columnName"));
+            }
             columnEntity.setDataType(column.get("dataType"));
             columnEntity.setComments(column.get("columnComment"));
             columnEntity.setExtra(column.get("extra"));

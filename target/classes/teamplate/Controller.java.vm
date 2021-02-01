@@ -123,8 +123,8 @@ public class ${className}Controller extends BaseWebController {
             return JsonUtil.<${className}>ObjectToList(list,
             (m, entity) -> {
                 adapterField(m, entity);
-            }#foreach ($column in $columns)   #if($column.columnName =="i_sort") ${className}::getSort #end,${className}::get$column.attrName ##
-#end );
+            }#foreach ($column in $columns)   #if($column.columnName =="i_sort") ,${className}::getSort #else ,${className}::get$column.attrName ##
+#end #end );
     }
 
     /**
@@ -136,8 +136,8 @@ public class ${className}Controller extends BaseWebController {
             return JsonUtil.<${className}>ObjectToMap(ent,
             (m, entity) -> {
                 adapterField(m, entity);
-            }#foreach ($column in $columns) #if($column.columnName =="i_sort") ${className}::getSort #end,${className}::get$column.attrName ##
-         #end );
+            }#foreach ($column in $columns) #if($column.columnName =="i_sort") ,${className}::getSort #else ,${className}::get$column.attrName ##
+ #end #end);
     }
 
     /**
