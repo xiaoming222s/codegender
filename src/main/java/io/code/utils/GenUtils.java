@@ -59,23 +59,18 @@ public class GenUtils {
         String className = tableToJava(tableEntity.getTableName(), config.getString("tablePrefix"));
         tableEntity.setClassName(className);
         tableEntity.setClassname(StringUtils.uncapitalize(className));
-
         //列信息
         List<ColumnEntity> columsList = new ArrayList<>();
         Boolean generEnum = false;
         String enumName = "";
         for (Map<String, String> column : columns) {
             ColumnEntity columnEntity = new ColumnEntity();
-            if(column.get("columnName").contains("i_")){
-                columnEntity.setColumnName(column.get("columnName").replace("i_",""));
-            }else {
-                columnEntity.setColumnName(column.get("columnName"));
-            }
+            columnEntity.setColumnName(column.get("columnName"));
             columnEntity.setDataType(column.get("dataType"));
             columnEntity.setComments(column.get("columnComment"));
             columnEntity.setExtra(column.get("extra"));
-            //列名转换成Java属性名
-            String attrName = columnToJava(columnEntity.getColumnName());
+            //列名转换成Java属性名 剔除i_
+            String attrName = columnToJava(columnEntity.getColumnName().replace("i_",""));
             columnEntity.setAttrName(attrName);
             columnEntity.setAttrname(StringUtils.uncapitalize(attrName));
             boolean enumFlagBoolean = column.get("columnComment").contains(enumFlag);
@@ -107,8 +102,8 @@ public class GenUtils {
         if (tableEntity.getPk() == null) {
             tableEntity.setPk(tableEntity.getColumns().get(0));
         }
-
         //设置velocity资源加载器
+
         Properties prop = new Properties();
         prop.put("file.resource.loader.class", "org.apache.velocity.runtime.resource.loader.ClasspathResourceLoader");
         Velocity.init(prop);

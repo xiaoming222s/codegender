@@ -23,7 +23,7 @@ public class m${className} extends BaseEntity {
  #foreach ($column in $columns)
 
 
-#if($column.columnName !="id"&&$column.columnName !="gmt_create"&&$column.columnName !=  "gmt_create"&&$column.columnName !="is_deleted"&&$column.columnName !="i_sort"&&$column.columnName !="notes"&&$column.columnName !="editor"&&$column.columnName !="creator")
+#if($column.columnName !="id"&&$column.columnName !="gmt_create"&&$column.columnName !=  "gmt_modified"&&$column.columnName !="is_deleted"&&$column.columnName !="i_sort"&&$column.columnName !="notes"&&$column.columnName !="editor"&&$column.columnName !="creator")
  /**
   * $column.comments
   */
